@@ -104,18 +104,39 @@ export default function FilterPanel({
                     <label className="block text-sm font-medium mb-2">
                         Number of Videos: <span className="gradient-text font-bold">{count}</span>
                     </label>
-                    <input
-                        type="range"
-                        min="1"
-                        max="20"
-                        value={count}
-                        onChange={(e) => setCount(parseInt(e.target.value))}
-                        className="w-full accent-current"
-                        style={{ accentColor: "var(--primary-start)" }}
-                    />
-                    <div className="flex justify-between text-xs" style={{ color: "var(--foreground-muted)" }}>
-                        <span>1</span>
-                        <span>20</span>
+
+                    {/* Mobile: Preset buttons */}
+                    <div className="flex gap-2 md:hidden">
+                        {[5, 10, 15, 20].map((preset) => (
+                            <button
+                                key={preset}
+                                type="button"
+                                onClick={() => setCount(preset)}
+                                className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${count === preset
+                                        ? 'bg-gradient-to-r from-[var(--primary-start)] to-[var(--primary-end)] text-white'
+                                        : 'bg-[var(--background-hover)] hover:bg-[var(--border)]'
+                                    }`}
+                            >
+                                {preset}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Desktop: Slider */}
+                    <div className="hidden md:block">
+                        <input
+                            type="range"
+                            min="1"
+                            max="20"
+                            value={count}
+                            onChange={(e) => setCount(parseInt(e.target.value))}
+                            className="w-full accent-current"
+                            style={{ accentColor: "var(--primary-start)" }}
+                        />
+                        <div className="flex justify-between text-xs" style={{ color: "var(--foreground-muted)" }}>
+                            <span>1</span>
+                            <span>20</span>
+                        </div>
                     </div>
                 </div>
 
