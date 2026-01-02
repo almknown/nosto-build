@@ -147,6 +147,24 @@ export default function PlaylistResult({ playlist, onReset }: PlaylistResultProp
                     </a>
                 ))}
             </div>
+
+            {/* Sticky Mobile CTA */}
+            <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-[var(--background)] via-[var(--background)] to-transparent md:hidden z-50">
+                <a
+                    href={playlist.watchUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-primary w-full flex items-center justify-center gap-2 shadow-lg"
+                >
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z" />
+                    </svg>
+                    Watch on YouTube
+                </a>
+            </div>
+
+            {/* Bottom padding for mobile sticky CTA */}
+            <div className="h-20 md:hidden" />
         </div>
     );
 }

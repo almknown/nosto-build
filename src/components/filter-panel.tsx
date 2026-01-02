@@ -54,7 +54,34 @@ export default function FilterPanel({
         <div className="glass-card p-6 w-full max-w-xl">
             <h3 className="text-lg font-semibold mb-4 gradient-text">Customize Your Playlist</h3>
 
-            <div className="space-y-5">
+            {/* Quick Mode */}
+            <div className="mb-6 p-4 rounded-lg border border-[var(--border)] bg-[var(--background)]">
+                <div className="flex items-center justify-between gap-4">
+                    <div>
+                        <p className="font-medium text-sm">⚡ Quick Mode</p>
+                        <p className="text-xs" style={{ color: "var(--foreground-muted)" }}>
+                            Skip the options, get 10 random classics
+                        </p>
+                    </div>
+                    <button
+                        className="btn-secondary text-sm whitespace-nowrap"
+                        onClick={onGenerate}
+                        disabled={loading || disabled}
+                    >
+                        {loading ? "Generating..." : "🎲 Surprise Me!"}
+                    </button>
+                </div>
+            </div>
+
+            <div className="relative">
+                <div className="absolute inset-x-0 top-0 flex items-center">
+                    <div className="flex-1 border-t border-[var(--border)]" />
+                    <span className="px-3 text-xs" style={{ color: "var(--foreground-muted)" }}>or customize</span>
+                    <div className="flex-1 border-t border-[var(--border)]" />
+                </div>
+            </div>
+
+            <div className="space-y-5 pt-6">
                 {/* AI Topic Prompt - Featured */}
                 <div>
                     <label className="block text-sm font-medium mb-2">
