@@ -31,7 +31,7 @@ export async function selectVideosByTopic(
 
     try {
         const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
         // Prepare video metadata for AI (limit to avoid token limits)
         const videoSummaries = videos.slice(0, 200).map((v, idx) => ({
