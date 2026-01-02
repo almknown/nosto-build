@@ -33,8 +33,16 @@ export async function selectVideosByTopic(
 
     try {
         const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-        // Using flash-latest as confirmed via list_models
-        const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+        // Using "gemini-flash-latest" with safety settings disabled to prevent blocking on video titles
+        const model = genAI.getGenerativeModel({
+            model: "gemini-flash-latest",
+            safetySettings: [
+                { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_NONE" },
+                { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_NONE" },
+                { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_NONE" },
+                { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" },
+            ]
+        });
 
         // Prepare video metadata for AI (limit to avoid token limits)
         const videoSummaries = videos.slice(0, 200).map((v, idx) => ({
@@ -91,9 +99,9 @@ Select UP TO ${maxVideos} videos. strictly exclude unrelated content.`;
             selectedVideoIds: selectedIds.slice(0, maxVideos),
             reasoning: parsed.reasoning,
         };
-    } catch (error) {
+    } catch (error: any) {
         console.error("Gemini API error:", error);
-        return fallbackKeywordMatching(videos, topicPrompt, maxVideos);
+        return fallbackKeywordMatching(videos, topicPrompt, maxVideos, `AI Failed: ${error.message} \nDetails: ${JSON.stringify(error.response || "No details")}`);
     }
 }
 
@@ -103,7 +111,8 @@ Select UP TO ${maxVideos} videos. strictly exclude unrelated content.`;
 function fallbackKeywordMatching(
     videos: VideoMetadata[],
     topicPrompt: string,
-    maxVideos: number
+    maxVideos: number,
+    errorReason?: string
 ): TopicSelectionResult {
     const keywords = topicPrompt.toLowerCase().split(/\s+/).filter(k => k.length > 2);
 
@@ -142,6 +151,6 @@ function fallbackKeywordMatching(
 
     return {
         selectedVideoIds: selected,
-        reasoning: `Matched ${selected.length} videos using keywords: ${keywords.join(", ")}`,
+        reasoning: `Matched ${selected.length} videos using keywords: ${keywords.join(", ")}` + (errorReason ? ` (Fallback Cause: ${errorReason})` : ""),
     };
 }

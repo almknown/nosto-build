@@ -83,11 +83,10 @@ export async function generatePlaylist(
         selectedVideos = preFiltered.filter(v => selectedIds.has(v.youtubeVideoId));
         aiReasoning = aiResult.reasoning;
 
-        // If AI returned fewer than requested, fill with random videos
+        // If AI returned fewer than requested, we RESPECT that choice (Quality over Quantity)
+        // Do NOT backfill with random videos.
         if (selectedVideos.length < count) {
-            const remaining = preFiltered.filter(v => !selectedIds.has(v.youtubeVideoId));
-            const shuffled = shuffleArray(remaining);
-            selectedVideos = [...selectedVideos, ...shuffled.slice(0, count - selectedVideos.length)];
+            console.log(`AI returned ${selectedVideos.length} videos (requested ${count}). Keeping strictly relevant results.`);
         }
     } else {
         // Traditional filter-based selection
