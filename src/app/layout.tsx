@@ -15,12 +15,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Nostalgia Playlist Generator | Rediscover YouTube Classics",
-  description: "Generate nostalgic playlists from any YouTube channel. Filter by year, find hidden gems, and relive the golden era of your favorite creators.",
-  keywords: ["youtube", "playlist", "nostalgia", "generator", "retro", "classic videos"],
+  title: "NosBot | AI-Powered YouTube History Curator",
+  description: "NosBot uses advanced AI to curate playlists from any YouTube channel's history. Precise filtering, deep search, and intelligent context understanding.",
+  keywords: ["youtube", "playlist", "ai", "curator", "nosbot", "history", "video search"],
   openGraph: {
-    title: "Nostalgia Playlist Generator",
-    description: "Rediscover the golden era of YouTube",
+    title: "NosBot | Intelligent Video Curation",
+    description: "Your AI Curator for YouTube History",
     type: "website",
   },
 };

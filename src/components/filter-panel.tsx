@@ -45,7 +45,8 @@ export default function FilterPanel({
         onFiltersChange(filters, count);
     }, [yearStart, yearEnd, topicPrompt, deepCuts, excludeShorts, count, minDuration, maxDuration, onFiltersChange]);
 
-    const years = Array.from({ length: currentYear - 2005 + 1 }, (_, i) => 2005 + i).reverse();
+    const yearsDesc = Array.from({ length: currentYear - 2005 + 1 }, (_, i) => 2005 + i).reverse();
+    const yearsAsc = [...yearsDesc].reverse();
 
     return (
         <div className="glass-card p-6 w-full max-w-xl">
@@ -102,7 +103,7 @@ export default function FilterPanel({
                             }}
                         >
                             <option value="">From...</option>
-                            {years.map((y) => (
+                            {yearsAsc.map((y) => (
                                 <option key={y} value={y}>{y}</option>
                             ))}
                         </select>
@@ -116,7 +117,7 @@ export default function FilterPanel({
                             }}
                         >
                             <option value="">To...</option>
-                            {years.map((y) => (
+                            {yearsDesc.map((y) => (
                                 <option key={y} value={y}>{y}</option>
                             ))}
                         </select>
@@ -134,12 +135,16 @@ export default function FilterPanel({
                             <select
                                 className="input w-full"
                                 value={minDuration}
-                                onChange={(e) => setMinDuration(parseInt(e.target.value))}
+                                onChange={(e) => setMinDuration(parseFloat(e.target.value))}
                             >
                                 <option value="0">No min</option>
+                                <option value="0.5">30 sec</option>
                                 <option value="1">1 min</option>
+                                <option value="1.5">1 m 30s</option>
                                 <option value="2">2 min</option>
+                                <option value="2.5">2 m 30s</option>
                                 <option value="3">3 min</option>
+                                <option value="4">4 min</option>
                                 <option value="5">5 min</option>
                                 <option value="8">8 min</option>
                                 <option value="10">10 min</option>
@@ -154,10 +159,16 @@ export default function FilterPanel({
                             <select
                                 className="input w-full"
                                 value={maxDuration}
-                                onChange={(e) => setMaxDuration(parseInt(e.target.value))}
+                                onChange={(e) => setMaxDuration(parseFloat(e.target.value))}
                             >
                                 <option value="0">No max</option>
+                                <option value="0.5">30 sec</option>
+                                <option value="1">1 min</option>
+                                <option value="1.5">1 m 30s</option>
+                                <option value="2">2 min</option>
+                                <option value="2.5">2 m 30s</option>
                                 <option value="3">3 min</option>
+                                <option value="4">4 min</option>
                                 <option value="5">5 min</option>
                                 <option value="8">8 min</option>
                                 <option value="10">10 min</option>

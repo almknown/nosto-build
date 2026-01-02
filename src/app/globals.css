@@ -5,19 +5,19 @@
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 :root {
-  /* Color Palette */
-  --primary-start: #8b5cf6;
-  --primary-end: #ec4899;
-  --primary-hover: #7c3aed;
+  /* Color Palette - NosBot Premium Theme */
+  --primary-start: #6366f1; /* Indigo 500 */
+  --primary-end: #0ea5e9;   /* Sky 500 */
+  --primary-hover: #4f46e5; /* Indigo 600 */
 
-  --background: #0f0f1a;
-  --background-card: #1a1a2e;
-  --background-hover: #252540;
+  --background: #020617;    /* Slate 950 */
+  --background-card: #0f172a; /* Slate 900 */
+  --background-hover: #1e293b; /* Slate 800 */
 
-  --foreground: #f8fafc;
-  --foreground-muted: #94a3b8;
+  --foreground: #f8fafc;    /* Slate 50 */
+  --foreground-muted: #94a3b8; /* Slate 400 */
 
-  --border: #2d2d44;
+  --border: #1e293b;        /* Slate 800 */
   --error: #ef4444;
   --success: #10b981;
   --warning: #f59e0b;

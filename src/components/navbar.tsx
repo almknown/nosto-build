@@ -22,27 +22,39 @@ export default function Navbar() {
                 <div className="flex items-center justify-between h-16">
                     {/* Logo */}
                     <Link href="/" className="flex items-center gap-2 font-bold text-lg">
-                        <span className="text-2xl">📼</span>
-                        <span className="gradient-text hidden sm:inline">Nostalgia</span>
+                        <span className="text-2xl">✨</span>
+                        <span className="gradient-text hidden sm:inline">NosBot</span>
                     </Link>
 
                     {/* Desktop Nav Links */}
                     <div className="hidden md:flex items-center gap-6">
-                        {navLinks.map((link) => (
-                            <Link
-                                key={link.href}
-                                href={link.href}
-                                className={`text-sm font-medium transition-colors ${pathname === link.href
+                        {navLinks.map((link) => {
+                            const isHistory = link.label === "History";
+                            const isDisabled = isHistory && !session;
+
+                            return (
+                                <Link
+                                    key={link.href}
+                                    href={isDisabled ? "/login" : link.href}
+                                    className={`text-sm font-medium transition-colors ${pathname === link.href
                                         ? "gradient-text"
                                         : ""
-                                    }`}
-                                style={{
-                                    color: pathname === link.href ? undefined : "var(--foreground-muted)",
-                                }}
-                            >
-                                {link.label}
-                            </Link>
-                        ))}
+                                        } ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
+                                    style={{
+                                        color: pathname === link.href ? undefined : "var(--foreground-muted)",
+                                    }}
+                                    onClick={(e) => {
+                                        if (isDisabled) {
+                                            e.preventDefault();
+                                            // Optional: visual feedback or redirect logic could go here
+                                        }
+                                    }}
+                                >
+                                    {link.label}
+                                    {isDisabled && <span className="ml-1 text-[10px] opacity-70">🔒</span>}
+                                </Link>
+                            );
+                        })}
                     </div>
 
                     {/* Auth Section */}

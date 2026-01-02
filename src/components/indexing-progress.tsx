@@ -6,13 +6,14 @@ import type { ChannelResponse } from "@/types";
 interface IndexingProgressProps {
     channel: ChannelResponse;
     onComplete: (channel: ChannelResponse) => void;
+    onCancel?: () => void;
 }
 
 const MAX_RETRIES = 3;
 const STALE_TIMEOUT_MS = 60000; // 60 seconds without progress = stale
 const POLL_INTERVAL_MS = 2000;
 
-export default function IndexingProgress({ channel, onComplete }: IndexingProgressProps) {
+export default function IndexingProgress({ channel, onComplete, onCancel }: IndexingProgressProps) {
     const [status, setStatus] = useState(channel.indexStatus);
     const [indexedCount, setIndexedCount] = useState(channel.indexedVideoCount);
     const [error, setError] = useState<string | null>(null);
@@ -196,14 +197,24 @@ export default function IndexingProgress({ channel, onComplete }: IndexingProgre
                         : "Starting indexer..."}
                 </p>
 
-                {isStale && (
-                    <button
-                        onClick={handleRetry}
-                        className="btn-secondary text-sm px-3 py-1"
-                    >
-                        Retry
-                    </button>
-                )}
+                <div className="flex gap-2">
+                    {onCancel && (
+                        <button
+                            onClick={onCancel}
+                            className="btn-secondary text-sm px-3 py-1"
+                        >
+                            Cancel
+                        </button>
+                    )}
+                    {isStale && (
+                        <button
+                            onClick={handleRetry}
+                            className="btn-secondary text-sm px-3 py-1"
+                        >
+                            Retry
+                        </button>
+                    )}
+                </div>
             </div>
 
             {retryCount > 0 && (

@@ -86,10 +86,10 @@ export default function GeneratePage() {
                 {/* Header */}
                 <div className="text-center mb-12">
                     <h1 className="text-4xl md:text-5xl font-bold mb-4">
-                        <span className="gradient-text">Nostalgia Playlist</span> Generator
+                        <span className="gradient-text">NosBot</span> Generator
                     </h1>
                     <p className="text-lg" style={{ color: "var(--foreground-muted)" }}>
-                        Rediscover forgotten gems from your favorite YouTube channels
+                        Configure your filters and let AI curate the perfect playlist
                     </p>
                 </div>
 
@@ -138,7 +138,11 @@ export default function GeneratePage() {
                     {step === "search" && <ChannelSearch onSelect={handleChannelSelect} />}
 
                     {step === "indexing" && channel && (
-                        <IndexingProgress channel={channel} onComplete={handleIndexComplete} />
+                        <IndexingProgress
+                            channel={channel}
+                            onComplete={handleIndexComplete}
+                            onCancel={handleReset}
+                        />
                     )}
 
                     {step === "filter" && channel && (
