@@ -201,9 +201,9 @@ export default function IndexingProgress({ channel, onComplete, onCancel }: Inde
                     {onCancel && (
                         <button
                             onClick={onCancel}
-                            className="btn-secondary text-sm px-3 py-1"
+                            className="px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-red-500/30 text-red-500 hover:bg-red-500/10"
                         >
-                            Cancel
+                            Cancel Indexing
                         </button>
                     )}
                     {isStale && (

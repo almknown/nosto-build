@@ -102,7 +102,7 @@ export default function GeneratePage() {
                                 {["search", "indexing", "filter"].map((s, i) => (
                                     <div key={s} className="flex items-center">
                                         <div
-                                            className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all ${step === s
+                                            className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all ${step === s
                                                 ? "animate-pulse-glow"
                                                 : i < ["search", "indexing", "filter"].indexOf(step)
                                                     ? ""
@@ -193,7 +193,15 @@ export default function GeneratePage() {
                         )}
 
                         {step === "result" && playlist && (
-                            <PlaylistResult playlist={playlist} onReset={handleReset} />
+                            <div className="w-full flex flex-col items-center">
+                                {playlist.videos.length < count && (
+                                    <div className="w-full max-w-4xl mb-6 p-4 rounded-lg border border-yellow-500/20 bg-yellow-500/10 text-yellow-200 text-sm text-center">
+                                        Found {playlist.videos.length} videos matching your specific criteria (requested {count}).
+                                        We excluded unrelated content to keep the playlist high quality.
+                                    </div>
+                                )}
+                                <PlaylistResult playlist={playlist} onReset={handleReset} />
+                            </div>
                         )}
                     </div>
                 </div>

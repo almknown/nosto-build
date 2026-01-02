@@ -29,8 +29,11 @@ export async function selectVideosByTopic(
         return fallbackKeywordMatching(videos, topicPrompt, maxVideos);
     }
 
+    console.log("AI Topic Selection: Using Gemini with key (present)");
+
     try {
         const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+        // Using flash-latest as confirmed via list_models
         const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
         // Prepare video metadata for AI (limit to avoid token limits)
@@ -43,26 +46,25 @@ export async function selectVideosByTopic(
             views: Number(v.viewCount),
         }));
 
-        const prompt = `You are an expert video curator, "NosBot". Your goal is to find videos that match a user's Specific Request, especially when it differs from the channel's "Standard Content".
-        
+        const prompt = `You are an expert video curator, "NosBot". Your goal is to find videos that match a user's Specific Request.
+
 User's Request: "${topicPrompt}"
 
 Videos (JSON array with idx, id, title, desc, year, views):
 ${JSON.stringify(videoSummaries, null, 0)}
 
 INSTRUCTIONS:
-1. **Analyze the Channel Context:** Look at the provided video list to determine the "Dominant Theme" of this channel (e.g., "League of Legends Gameplay", "Travel Vlogs", "Political Commentary").
+1. **Analyze the Channel Context:** Determine the dominant theme of this channel.
 2. **Contrastive Selection:** Compare the User's Request against the Dominant Theme.
-   - If the User's Request is BROAD (e.g., "Funny videos") and matches the Dominant Theme, select the best performing/most relevant ones.
-   - **CRITICAL:** If the User's Request contains specific QUALIFIERS (e.g., "Build", "Guide", "Iran", "Vlog") that distinguish a video from the channel's standard noise, **PRIORITIZE** these qualifiers above all else. 
-   - *Example:* If a channel is 90% "League of Legends Gameplay" and the user asks for "Funny Build", a video titled "Funny League Moments" (Generic) is LESS relevant than "Off-Meta Rammus BUILD" (Specific Match).
-   - *Example:* If a channel is 90% "Australia Stunts" and the user asks for "Iran", a video about "North Korea" is IRRELEVANT, even if it has 10M views. Return nothing if no true matches exist.
+   - If the User's Request is BROAD and matches the theme, select the best videos.
+   - **CRITICAL:** If the request has specific QUALIFIERS ("Iran", "Vlog", "Guide"), **PRIORITIZE** these matches.
+   - **QUALITY OVER QUANTITY:** If the user asks for "Iran" and there are only 2 relevant videos, **SELECT ONLY 2**. Do NOT fill the quota with unrelated videos.
 
 3. **Output Format:**
-Respond with ONLY a JSON object in this exact format:
-{"selectedIds": ["id1", "id2", ...], "reasoning": "Identified channel theme as [Theme]. Selected videos because [Explanation of how they match the specific qualifiers]"}
+Respond with ONLY a JSON object:
+{"selectedIds": ["id1", "id2"], "reasoning": "Selected 2 videos because..."}
 
-Select exactly ${maxVideos} videos (or fewer if strictly irrelevant).`;
+Select UP TO ${maxVideos} videos. strictly exclude unrelated content.`;
 
         const result = await model.generateContent(prompt);
         const responseText = result.response.text().trim();
