@@ -115,7 +115,13 @@ export default function ChannelSearch({ onSelect }: ChannelSearchProps) {
     };
 
     const selectResult = (result: SearchResult) => {
-        setQuery(result.title); // Or maybe show the ID/handle?
+        // Sync input value with what we're actually looking up
+        // Show the ID (handle) so user clearly sees what channel is selected
+        const displayValue = result.id.startsWith('UC')
+            ? result.title  // If it's a raw channel ID, show title
+            : result.id;    // If it's a handle like @MrBeast, show that
+        setQuery(displayValue);
+        setShowResults(false); // Hide dropdown immediately after selection
         handleLookup(result.id); // Use ID for precise lookup
     };
 

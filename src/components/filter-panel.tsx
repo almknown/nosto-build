@@ -24,8 +24,9 @@ export default function FilterPanel({
     const [deepCuts, setDeepCuts] = useState(false);
     const [excludeShorts, setExcludeShorts] = useState(true);
     const [count, setCount] = useState(10);
-    const [minDuration, setMinDuration] = useState<number>(0); // minutes
-    const [maxDuration, setMaxDuration] = useState<number>(0); // 0 = no limit
+    const [minDuration, setMinDuration] = useState<number>(0);
+    const [maxDuration, setMaxDuration] = useState<number>(0);
+    const [showAdvanced, setShowAdvanced] = useState(false);
 
     // Sync filters with parent
     useEffect(() => {
@@ -38,7 +39,6 @@ export default function FilterPanel({
         }
         if (deepCuts) filters.deepCuts = true;
         if (excludeShorts) filters.excludeShorts = true;
-        // Duration filters (convert minutes to seconds)
         if (minDuration > 0) filters.minDuration = minDuration * 60;
         if (maxDuration > 0) filters.maxDuration = maxDuration * 60;
 
@@ -47,6 +47,8 @@ export default function FilterPanel({
 
     const yearsDesc = Array.from({ length: currentYear - 2005 + 1 }, (_, i) => 2005 + i).reverse();
     const yearsAsc = [...yearsDesc].reverse();
+
+    const hasAdvancedFilters = yearStart || yearEnd || deepCuts || minDuration > 0 || maxDuration > 0;
 
     return (
         <div className="glass-card p-6 w-full max-w-xl">
@@ -60,13 +62,13 @@ export default function FilterPanel({
                     </label>
                     <textarea
                         className="input min-h-[80px] resize-none"
-                        placeholder='Describe what you want, e.g., "Teemo gameplay videos" or "funny moments from 2020" or "guide videos for beginners"'
+                        placeholder='e.g., "early gameplay videos" or "tutorials from 2018" or "funny moments compilation"'
                         value={topicPrompt}
                         onChange={(e) => setTopicPrompt(e.target.value)}
                         maxLength={500}
                     />
                     <p className="text-xs mt-1" style={{ color: "var(--foreground-muted)" }}>
-                        AI will analyze video titles and descriptions to find the best matches
+                        Leave empty for random classics from this channel
                     </p>
                 </div>
 
@@ -90,131 +92,140 @@ export default function FilterPanel({
                     </div>
                 </div>
 
-                {/* Year Range */}
-                <div>
-                    <label className="block text-sm font-medium mb-2">Era / Year Range (optional)</label>
-                    <div className="flex gap-3 items-center">
-                        <select
-                            className="input flex-1"
-                            value={yearStart ?? ""}
-                            onChange={(e) => {
-                                const val = e.target.value ? parseInt(e.target.value) : undefined;
-                                setYearStart(val);
-                            }}
-                        >
-                            <option value="">From...</option>
-                            {yearsAsc.map((y) => (
-                                <option key={y} value={y}>{y}</option>
-                            ))}
-                        </select>
-                        <span style={{ color: "var(--foreground-muted)" }}>to</span>
-                        <select
-                            className="input flex-1"
-                            value={yearEnd ?? ""}
-                            onChange={(e) => {
-                                const val = e.target.value ? parseInt(e.target.value) : undefined;
-                                setYearEnd(val);
-                            }}
-                        >
-                            <option value="">To...</option>
-                            {yearsDesc.map((y) => (
-                                <option key={y} value={y}>{y}</option>
-                            ))}
-                        </select>
-                    </div>
-                </div>
-
-                {/* Duration Range */}
-                <div>
-                    <label className="block text-sm font-medium mb-2">
-                        ⏱️ Video Duration (minutes)
-                    </label>
-                    <div className="flex gap-3 items-center">
-                        <div className="flex-1">
-                            <label className="text-xs mb-1 block" style={{ color: "var(--foreground-muted)" }}>Min</label>
-                            <select
-                                className="input w-full"
-                                value={minDuration}
-                                onChange={(e) => setMinDuration(parseFloat(e.target.value))}
-                            >
-                                <option value="0">No min</option>
-                                <option value="0.5">30 sec</option>
-                                <option value="1">1 min</option>
-                                <option value="1.5">1 m 30s</option>
-                                <option value="2">2 min</option>
-                                <option value="2.5">2 m 30s</option>
-                                <option value="3">3 min</option>
-                                <option value="4">4 min</option>
-                                <option value="5">5 min</option>
-                                <option value="8">8 min</option>
-                                <option value="10">10 min</option>
-                                <option value="15">15 min</option>
-                                <option value="20">20 min</option>
-                                <option value="30">30 min</option>
-                            </select>
-                        </div>
-                        <span style={{ color: "var(--foreground-muted)", marginTop: "18px" }}>to</span>
-                        <div className="flex-1">
-                            <label className="text-xs mb-1 block" style={{ color: "var(--foreground-muted)" }}>Max</label>
-                            <select
-                                className="input w-full"
-                                value={maxDuration}
-                                onChange={(e) => setMaxDuration(parseFloat(e.target.value))}
-                            >
-                                <option value="0">No max</option>
-                                <option value="0.5">30 sec</option>
-                                <option value="1">1 min</option>
-                                <option value="1.5">1 m 30s</option>
-                                <option value="2">2 min</option>
-                                <option value="2.5">2 m 30s</option>
-                                <option value="3">3 min</option>
-                                <option value="4">4 min</option>
-                                <option value="5">5 min</option>
-                                <option value="8">8 min</option>
-                                <option value="10">10 min</option>
-                                <option value="15">15 min</option>
-                                <option value="20">20 min</option>
-                                <option value="30">30 min</option>
-                                <option value="45">45 min</option>
-                                <option value="60">60 min</option>
-                            </select>
-                        </div>
-                    </div>
-                    {minDuration > 0 || maxDuration > 0 ? (
-                        <p className="text-xs mt-1 font-medium" style={{ color: "var(--primary-start)" }}>
-                            📏 Filtering: {minDuration > 0 ? `${minDuration}+ min` : "any"}
-                            {maxDuration > 0 ? ` up to ${maxDuration} min` : ""}
-                        </p>
-                    ) : null}
-                </div>
-
-                {/* Toggles */}
-                <div className="flex flex-wrap gap-4">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                            type="checkbox"
-                            checked={deepCuts}
-                            onChange={(e) => setDeepCuts(e.target.checked)}
-                            className="w-5 h-5 rounded"
-                        />
-                        <span className="text-sm">Deep Cuts Only</span>
-                        <span
-                            className="text-xs px-2 py-0.5 rounded-full"
-                            style={{ background: "var(--background-hover)", color: "var(--foreground-muted)" }}
-                        >
-                            Bottom 25% views
+                {/* Advanced Options Accordion */}
+                <div className="border border-[var(--border)] rounded-lg overflow-hidden">
+                    <button
+                        type="button"
+                        onClick={() => setShowAdvanced(!showAdvanced)}
+                        className="w-full px-4 py-3 flex items-center justify-between text-sm font-medium hover:bg-[var(--background-hover)] transition-colors"
+                    >
+                        <span className="flex items-center gap-2">
+                            ⚙️ Advanced Options
+                            {hasAdvancedFilters && (
+                                <span
+                                    className="text-xs px-2 py-0.5 rounded-full"
+                                    style={{ background: "var(--primary-start)", color: "white" }}
+                                >
+                                    Active
+                                </span>
+                            )}
                         </span>
-                    </label>
+                        <svg
+                            className={`w-4 h-4 transition-transform ${showAdvanced ? 'rotate-180' : ''}`}
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
 
-                    <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                            type="checkbox"
-                            checked={excludeShorts}
-                            onChange={(e) => setExcludeShorts(e.target.checked)}
-                            className="w-5 h-5 rounded"
-                        />
-                        <span className="text-sm">Exclude Shorts</span>
-                    </label>
+                    {showAdvanced && (
+                        <div className="p-4 pt-0 space-y-4 border-t border-[var(--border)]">
+                            {/* Year Range */}
+                            <div className="pt-4">
+                                <label className="block text-sm font-medium mb-2">📅 Year Range</label>
+                                <div className="flex gap-3 items-center">
+                                    <select
+                                        className="input flex-1"
+                                        value={yearStart ?? ""}
+                                        onChange={(e) => {
+                                            const val = e.target.value ? parseInt(e.target.value) : undefined;
+                                            setYearStart(val);
+                                        }}
+                                    >
+                                        <option value="">From...</option>
+                                        {yearsAsc.map((y) => (
+                                            <option key={y} value={y}>{y}</option>
+                                        ))}
+                                    </select>
+                                    <span style={{ color: "var(--foreground-muted)" }}>to</span>
+                                    <select
+                                        className="input flex-1"
+                                        value={yearEnd ?? ""}
+                                        onChange={(e) => {
+                                            const val = e.target.value ? parseInt(e.target.value) : undefined;
+                                            setYearEnd(val);
+                                        }}
+                                    >
+                                        <option value="">To...</option>
+                                        {yearsDesc.map((y) => (
+                                            <option key={y} value={y}>{y}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+
+                            {/* Duration Range */}
+                            <div>
+                                <label className="block text-sm font-medium mb-2">⏱️ Video Duration</label>
+                                <div className="flex gap-3 items-center">
+                                    <div className="flex-1">
+                                        <label className="text-xs mb-1 block" style={{ color: "var(--foreground-muted)" }}>Min</label>
+                                        <select
+                                            className="input w-full"
+                                            value={minDuration}
+                                            onChange={(e) => setMinDuration(parseFloat(e.target.value))}
+                                        >
+                                            <option value="0">No min</option>
+                                            <option value="1">1 min</option>
+                                            <option value="2">2 min</option>
+                                            <option value="3">3 min</option>
+                                            <option value="5">5 min</option>
+                                            <option value="10">10 min</option>
+                                            <option value="15">15 min</option>
+                                        </select>
+                                    </div>
+                                    <span style={{ color: "var(--foreground-muted)", marginTop: "18px" }}>to</span>
+                                    <div className="flex-1">
+                                        <label className="text-xs mb-1 block" style={{ color: "var(--foreground-muted)" }}>Max</label>
+                                        <select
+                                            className="input w-full"
+                                            value={maxDuration}
+                                            onChange={(e) => setMaxDuration(parseFloat(e.target.value))}
+                                        >
+                                            <option value="0">No max</option>
+                                            <option value="5">5 min</option>
+                                            <option value="10">10 min</option>
+                                            <option value="15">15 min</option>
+                                            <option value="20">20 min</option>
+                                            <option value="30">30 min</option>
+                                            <option value="60">60 min</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Toggles */}
+                            <div className="flex flex-wrap gap-4">
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={deepCuts}
+                                        onChange={(e) => setDeepCuts(e.target.checked)}
+                                        className="w-5 h-5 rounded"
+                                    />
+                                    <span className="text-sm">Deep Cuts Only</span>
+                                    <span
+                                        className="text-xs px-2 py-0.5 rounded-full"
+                                        style={{ background: "var(--background-hover)", color: "var(--foreground-muted)" }}
+                                    >
+                                        Hidden gems
+                                    </span>
+                                </label>
+
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={excludeShorts}
+                                        onChange={(e) => setExcludeShorts(e.target.checked)}
+                                        className="w-5 h-5 rounded"
+                                    />
+                                    <span className="text-sm">Exclude Shorts</span>
+                                </label>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Generate Button */}

@@ -134,7 +134,7 @@ export default function IndexingProgress({ channel, onComplete, onCancel }: Inde
             <div className="glass-card p-6 text-center w-full max-w-xl">
                 <div className="text-4xl mb-4">⚠️</div>
                 <h3 className="font-semibold text-lg mb-2" style={{ color: "var(--error)" }}>
-                    Indexing Error
+                    Something went wrong
                 </h3>
                 <p className="mb-4 text-sm" style={{ color: "var(--foreground-muted)" }}>
                     {error}
@@ -177,7 +177,7 @@ export default function IndexingProgress({ channel, onComplete, onCancel }: Inde
             <div className="mb-3">
                 <div className="flex justify-between text-sm mb-1">
                     <span>
-                        {isStale ? "⚠️ Indexing may be stalled..." : "Indexing videos..."}
+                        {isStale ? "⚠️ Taking longer than expected..." : "Loading videos..."}
                     </span>
                     <span>
                         {indexedCount.toLocaleString()} / {totalCount.toLocaleString()}
@@ -192,9 +192,9 @@ export default function IndexingProgress({ channel, onComplete, onCancel }: Inde
                 <p className="text-sm" style={{ color: "var(--foreground-muted)" }}>
                     {status === "IN_PROGRESS"
                         ? isStale
-                            ? "Taking longer than expected..."
+                            ? "Hang tight, we're working on it..."
                             : "This may take a minute for large channels..."
-                        : "Starting indexer..."}
+                        : "Getting ready..."}
                 </p>
 
                 <div className="flex gap-2">
@@ -203,7 +203,7 @@ export default function IndexingProgress({ channel, onComplete, onCancel }: Inde
                             onClick={onCancel}
                             className="px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-red-500/30 text-red-500 hover:bg-red-500/10"
                         >
-                            Cancel Indexing
+                            Cancel
                         </button>
                     )}
                     {isStale && (
