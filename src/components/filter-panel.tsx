@@ -47,20 +47,45 @@ export default function FilterPanel({
             <h3 className="text-lg font-semibold mb-4 gradient-text">Customize Your Playlist</h3>
 
             <div className="space-y-5">
-                {/* AI Topic Prompt - Featured */}
+                {/* AI Topic Prompt - Featured & Enlarged */}
                 <div>
-                    <label className="block text-sm font-medium mb-2">
-                        🤖 What videos are you looking for?
+                    <label className="block text-lg font-semibold mb-3 flex items-center gap-2">
+                        <span className="text-2xl">🤖</span>
+                        <span className="gradient-text">What videos are you looking for?</span>
+                        <span
+                            className="text-xs px-2 py-1 rounded-full font-normal"
+                            style={{ background: "var(--background-hover)", color: "var(--foreground-muted)" }}
+                        >
+                            AI-Powered
+                        </span>
                     </label>
                     <textarea
-                        className="input min-h-[80px] resize-none"
-                        placeholder='Describe what you want, e.g., "Teemo gameplay videos" or "funny moments from 2020" or "guide videos for beginners"'
+                        className="input min-h-[100px] resize-none text-base"
+                        placeholder='Examples:
+• "Teemo gameplay videos from 2019-2020"
+• "Funny moments and fails"  
+• "In-depth guide videos for beginners"
+• "High elo ranked games"
+• "Champion spotlights and montages"
+
+AI will analyze titles & descriptions to find your perfect playlist!'
                         value={topicPrompt}
                         onChange={(e) => setTopicPrompt(e.target.value)}
                         maxLength={500}
+                        style={{
+                            transition: "all 0.3s ease",
+                            ...(topicPrompt && {
+                                borderColor: "var(--primary-start)",
+                                boxShadow: "0 0 0 3px rgba(139, 92, 246, 0.1)",
+                            }),
+                        }}
                     />
-                    <p className="text-xs mt-1" style={{ color: "var(--foreground-muted)" }}>
-                        AI will analyze video titles and descriptions to find the best matches
+                    <p className="text-xs mt-2 flex items-start gap-2" style={{ color: "var(--foreground-muted)" }}>
+                        <span>💡</span>
+                        <span>
+                            Tip: Be specific! The AI works best with clear descriptions like time periods,
+                            gameplay types, or video themes.
+                        </span>
                     </p>
                 </div>
 
