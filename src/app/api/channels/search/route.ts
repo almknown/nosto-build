@@ -23,7 +23,6 @@ export async function GET(request: NextRequest) {
         const results = response.data.items?.map((item) => ({
             id: item.snippet?.channelId!,
             title: item.snippet?.title || "",
-            handle: item.snippet?.customUrl || "", // customUrl might not be in snippet for search, but title is key
             thumbnailUrl: item.snippet?.thumbnails?.default?.url || "",
             description: item.snippet?.description || ""
         })) || [];
