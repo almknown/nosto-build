@@ -61,6 +61,9 @@ A YouTube Nostalgia Playlist Generator that creates randomized playlists from an
 | `QSTASH_TOKEN` | Upstash QStash token |
 | `QSTASH_CURRENT_SIGNING_KEY` | QStash webhook signing key |
 | `QSTASH_NEXT_SIGNING_KEY` | QStash next signing key |
+| `GEMINI_API_KEY` | Google Gemini API key for AI features |
+
+See [`docs/env.template.txt`](docs/env.template.txt) for detailed setup instructions.
 
 ## Commands
 
