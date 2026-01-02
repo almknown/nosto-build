@@ -1,0 +1,115 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// USER & AUTH
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  name            String?
+  image           String?
+  tier            Tier      @default(FREE)
+  dailyCredits    Int       @default(3)
+  lastCreditReset DateTime  @default(now())
+  
+  playlists       GeneratedPlaylist[]
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+enum Tier {
+  FREE
+  PRO
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// YOUTUBE CACHE
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+model Channel {
+  id                String      @id @default(cuid())
+  youtubeId         String      @unique
+  handle            String?     @unique
+  title             String
+  thumbnailUrl      String?
+  uploadPlaylistId  String
+  totalVideoCount   Int         @default(0)
+  indexedVideoCount Int         @default(0)
+  indexStatus       IndexStatus @default(PENDING)
+  lastSyncedAt      DateTime?
+  
+  videos            Video[]
+  
+  createdAt         DateTime    @default(now())
+  
+  @@index([handle])
+}
+
+enum IndexStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETE
+  FAILED
+}
+
+model Video {
+  id             String   @id @default(cuid())
+  youtubeVideoId String   @unique
+  title          String
+  description    String?  @db.Text
+  thumbnailUrl   String?
+  publishedAt    DateTime
+  duration       Int      // Seconds
+  viewCount      BigInt
+  
+  channelId      String
+  channel        Channel  @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  
+  @@index([channelId, publishedAt])
+  @@index([channelId, viewCount])
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// USER-GENERATED CONTENT
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+model GeneratedPlaylist {
+  id        String   @id @default(cuid())
+  name      String?
+  videoIds  String[] // Array of YouTube video IDs
+  filters   Json     // { yearStart, yearEnd, keywords, deepCuts }
+  watchUrl  String
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  channelId String
+  
+  createdAt DateTime @default(now())
+  
+  @@index([userId, createdAt])
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// QUOTA TRACKING
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+model QuotaLog {
+  id        String   @id @default(cuid())
+  units     Int
+  endpoint  String
+  
+  createdAt DateTime @default(now())
+  
+  @@index([createdAt])
+}
