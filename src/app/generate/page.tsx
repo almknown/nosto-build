@@ -81,10 +81,10 @@ export default function GeneratePage() {
     };
 
     return (
-        <main className="min-h-screen py-12 px-4">
-            <div className="max-w-4xl mx-auto">
+        <main className="min-h-screen py-12 px-4 flex flex-col items-center justify-center">
+            <div className="w-full max-w-3xl animate-fadeIn">
                 {/* Header */}
-                <div className="text-center mb-12">
+                <div className="text-center mb-10">
                     <h1 className="text-4xl md:text-5xl font-bold mb-4">
                         <span className="gradient-text">NosBot</span> Generator
                     </h1>
@@ -93,105 +93,109 @@ export default function GeneratePage() {
                     </p>
                 </div>
 
-                {/* Progress indicator */}
-                {step !== "result" && (
-                    <div className="flex justify-center mb-8">
-                        <div className="flex items-center gap-2">
-                            {["search", "indexing", "filter"].map((s, i) => (
-                                <div key={s} className="flex items-center">
-                                    <div
-                                        className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all ${step === s
-                                            ? "animate-pulse-glow"
-                                            : i < ["search", "indexing", "filter"].indexOf(step)
-                                                ? ""
-                                                : ""
-                                            }`}
-                                        style={{
-                                            background:
-                                                step === s || i < ["search", "indexing", "filter"].indexOf(step)
-                                                    ? "linear-gradient(135deg, var(--primary-start), var(--primary-end))"
-                                                    : "var(--background-card)",
-                                            border: "1px solid var(--border)",
-                                        }}
-                                    >
-                                        {i + 1}
-                                    </div>
-                                    {i < 2 && (
+                {/* Main Interaction Card */}
+                <div className="glass-card p-6 md:p-10 w-full relative overflow-visible">
+                    {/* Progress indicator */}
+                    {step !== "result" && (
+                        <div className="flex justify-center mb-8">
+                            <div className="flex items-center gap-2">
+                                {["search", "indexing", "filter"].map((s, i) => (
+                                    <div key={s} className="flex items-center">
                                         <div
-                                            className="w-12 h-0.5 mx-2"
+                                            className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all ${step === s
+                                                ? "animate-pulse-glow"
+                                                : i < ["search", "indexing", "filter"].indexOf(step)
+                                                    ? ""
+                                                    : ""
+                                                }`}
                                             style={{
                                                 background:
-                                                    i < ["search", "indexing", "filter"].indexOf(step)
-                                                        ? "var(--primary-start)"
-                                                        : "var(--border)",
+                                                    step === s || i < ["search", "indexing", "filter"].indexOf(step)
+                                                        ? "linear-gradient(135deg, var(--primary-start), var(--primary-end))"
+                                                        : "var(--background-card)",
+                                                border: "1px solid var(--border)",
                                             }}
+                                        >
+                                            {i + 1}
+                                        </div>
+                                        {i < 2 && (
+                                            <div
+                                                className="w-12 h-0.5 mx-2"
+                                                style={{
+                                                    background:
+                                                        i < ["search", "indexing", "filter"].indexOf(step)
+                                                            ? "var(--primary-start)"
+                                                            : "var(--border)",
+                                                }}
+                                            />
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Steps Content */}
+                    <div className="flex flex-col items-center w-full">
+                        {step === "search" && <ChannelSearch onSelect={handleChannelSelect} />}
+
+                        {step === "indexing" && channel && (
+                            <IndexingProgress
+                                channel={channel}
+                                onComplete={handleIndexComplete}
+                                onCancel={handleReset}
+                            />
+                        )}
+
+                        {step === "filter" && channel && (
+                            <div className="w-full">
+                                {/* Channel Info - Inline */}
+                                <div className="flex items-center gap-4 mb-8 p-4 rounded-lg bg-[var(--background)] border border-[var(--border)]">
+                                    {channel.thumbnailUrl && (
+                                        <img
+                                            src={channel.thumbnailUrl}
+                                            alt={channel.title}
+                                            className="w-12 h-12 rounded-full ring-2 ring-[var(--primary-start)]"
                                         />
                                     )}
+                                    <div className="flex-1">
+                                        <h3 className="font-semibold text-lg">{channel.title}</h3>
+                                        <p className="text-sm" style={{ color: "var(--foreground-muted)" }}>
+                                            {channel.indexedVideoCount.toLocaleString()} videos found
+                                        </p>
+                                    </div>
+                                    <button
+                                        className="text-sm px-3 py-1.5 rounded hover:text-white transition-colors"
+                                        style={{ color: "var(--foreground-muted)" }}
+                                        onClick={handleReset}
+                                    >
+                                        Change Channel
+                                    </button>
                                 </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
 
-                {/* Content */}
-                <div className="flex flex-col items-center">
-                    {step === "search" && <ChannelSearch onSelect={handleChannelSelect} />}
+                                <FilterPanel
+                                    onFiltersChange={handleFiltersChange}
+                                    onGenerate={handleGenerate}
+                                    loading={loading}
+                                    disabled={false}
+                                // Pass full width to children
+                                />
 
-                    {step === "indexing" && channel && (
-                        <IndexingProgress
-                            channel={channel}
-                            onComplete={handleIndexComplete}
-                            onCancel={handleReset}
-                        />
-                    )}
-
-                    {step === "filter" && channel && (
-                        <div className="w-full max-w-xl">
-                            {/* Channel card */}
-                            <div className="glass-card p-4 mb-6 flex items-center gap-4">
-                                {channel.thumbnailUrl && (
-                                    <img
-                                        src={channel.thumbnailUrl}
-                                        alt={channel.title}
-                                        className="w-12 h-12 rounded-full"
-                                    />
+                                {error && (
+                                    <div
+                                        className="mt-6 p-4 rounded-lg text-center border border-red-500/20"
+                                        style={{ background: "rgba(239, 68, 68, 0.1)", color: "var(--error)" }}
+                                    >
+                                        {error}
+                                    </div>
                                 )}
-                                <div className="flex-1">
-                                    <h3 className="font-semibold">{channel.title}</h3>
-                                    <p className="text-sm" style={{ color: "var(--foreground-muted)" }}>
-                                        {channel.indexedVideoCount.toLocaleString()} videos indexed
-                                    </p>
-                                </div>
-                                <button
-                                    className="text-sm px-3 py-1 rounded"
-                                    style={{ background: "var(--background-hover)" }}
-                                    onClick={handleReset}
-                                >
-                                    Change
-                                </button>
                             </div>
+                        )}
 
-                            <FilterPanel
-                                onFiltersChange={handleFiltersChange}
-                                onGenerate={handleGenerate}
-                                loading={loading}
-                                disabled={false}
-                            />
-
-                            {error && (
-                                <div
-                                    className="mt-4 p-4 rounded-lg text-center"
-                                    style={{ background: "rgba(239, 68, 68, 0.1)", color: "var(--error)" }}
-                                >
-                                    {error}
-                                </div>
-                            )}
-                        </div>
-                    )}
-
-                    {step === "result" && playlist && (
-                        <PlaylistResult playlist={playlist} onReset={handleReset} />
-                    )}
+                        {step === "result" && playlist && (
+                            <PlaylistResult playlist={playlist} onReset={handleReset} />
+                        )}
+                    </div>
                 </div>
             </div>
         </main>

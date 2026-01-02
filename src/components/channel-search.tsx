@@ -102,7 +102,15 @@ export default function ChannelSearch({ onSelect }: ChannelSearchProps) {
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === "Enter" && !submitting) {
-            handleLookup(query);
+            e.preventDefault(); // Prevent form submission if any
+
+            // If we have live results, select the first one
+            if (results.length > 0) {
+                selectResult(results[0]);
+            } else {
+                // Otherwise fall back to trying a direct lookup
+                handleLookup(query);
+            }
         }
     };
 
