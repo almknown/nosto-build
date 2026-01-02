@@ -22,7 +22,7 @@ export async function GET() {
         });
 
         // Get channel info for each playlist
-        const channelIds = [...new Set(playlists.map((p) => p.channelId))];
+        const channelIds = [...new Set(playlists.map((p: typeof playlists[0]) => p.channelId))];
         const channels = await prisma.channel.findMany({
             where: { id: { in: channelIds } },
             select: {
@@ -33,9 +33,9 @@ export async function GET() {
             },
         });
 
-        const channelMap = new Map(channels.map((c) => [c.id, c]));
+        const channelMap = new Map(channels.map((c: typeof channels[0]) => [c.id, c]));
 
-        const response = playlists.map((p) => ({
+        const response = playlists.map((p: typeof playlists[0]) => ({
             id: p.id,
             name: p.name,
             videoIds: p.videoIds,
