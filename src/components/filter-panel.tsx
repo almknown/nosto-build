@@ -51,20 +51,20 @@ export default function FilterPanel({
     const hasAdvancedFilters = yearStart || yearEnd || deepCuts || minDuration > 0 || maxDuration > 0;
 
     return (
-        <div className="glass-card p-6 w-full max-w-xl">
-            <h3 className="text-lg font-semibold mb-4 gradient-text">Customize Your Playlist</h3>
-
-            {/* Quick Mode */}
-            <div className="mb-6 p-4 rounded-lg border border-[var(--border)] bg-[var(--background)]">
+        <div className="w-full">
+            {/* Quick Mode Card */}
+            <div className="glass-card p-5 mb-6 border-2 border-dashed" style={{ borderColor: "var(--border)" }}>
                 <div className="flex items-center justify-between gap-4">
                     <div>
-                        <p className="font-medium text-sm">⚡ Quick Mode</p>
-                        <p className="text-xs" style={{ color: "var(--foreground-muted)" }}>
-                            Skip the options, get 10 random classics
+                        <p className="font-semibold text-base flex items-center gap-2">
+                            <span className="text-xl">⚡</span> Quick Mode
+                        </p>
+                        <p className="text-sm mt-1" style={{ color: "var(--foreground-muted)" }}>
+                            Skip customization — get 10 random classics
                         </p>
                     </div>
                     <button
-                        className="btn-secondary text-sm whitespace-nowrap"
+                        className="btn-secondary text-sm whitespace-nowrap px-5 py-2.5 rounded-xl"
                         onClick={onGenerate}
                         disabled={loading || disabled}
                     >
@@ -73,107 +73,144 @@ export default function FilterPanel({
                 </div>
             </div>
 
-            <div className="relative">
-                <div className="absolute inset-x-0 top-0 flex items-center">
-                    <div className="flex-1 border-t border-[var(--border)]" />
-                    <span className="px-3 text-xs" style={{ color: "var(--foreground-muted)" }}>or customize</span>
-                    <div className="flex-1 border-t border-[var(--border)]" />
+            {/* Divider */}
+            <div className="relative my-8">
+                <div className="absolute inset-x-0 top-1/2 border-t" style={{ borderColor: "var(--border)" }} />
+                <div className="relative flex justify-center">
+                    <span className="px-4 text-sm font-medium" style={{ background: "var(--background-card)", color: "var(--foreground-muted)" }}>
+                        or customize your playlist
+                    </span>
                 </div>
             </div>
 
-            <div className="space-y-5 pt-6">
-                {/* AI Topic Prompt - Featured */}
-                <div>
-                    <label className="block text-sm font-medium mb-2">
-                        🤖 What videos are you looking for?
+            {/* AI Topic Prompt - Featured Card */}
+            <div className="glass-card p-6 mb-6 relative overflow-hidden">
+                <div
+                    className="absolute inset-0 opacity-30"
+                    style={{
+                        background: "radial-gradient(ellipse at top right, rgba(139, 92, 246, 0.15), transparent 60%)",
+                    }}
+                />
+                <div className="relative">
+                    <label className="block text-base font-semibold mb-3 flex items-center gap-2">
+                        <span className="text-xl">🤖</span>
+                        What videos are you looking for?
                     </label>
                     <textarea
-                        className="input min-h-[80px] resize-none"
-                        placeholder='e.g., "early gameplay videos" or "tutorials from 2018" or "funny moments compilation"'
+                        className="input min-h-[100px] resize-none text-base"
+                        placeholder='Try: "funny moments from 2018" or "tutorial videos" or "gaming highlights"'
                         value={topicPrompt}
                         onChange={(e) => setTopicPrompt(e.target.value)}
                         maxLength={500}
                     />
-                    <p className="text-xs mt-1" style={{ color: "var(--foreground-muted)" }}>
+                    <p className="text-xs mt-2" style={{ color: "var(--foreground-muted)" }}>
                         Leave empty for random classics from this channel
                     </p>
                 </div>
+            </div>
 
-                {/* Playlist Count */}
-                <div>
-                    <label className="block text-sm font-medium mb-2">
-                        Number of Videos: <span className="gradient-text font-bold">{count}</span>
-                    </label>
+            {/* Playlist Count with Visual Slider */}
+            <div className="mb-6">
+                <label className="block text-sm font-semibold mb-3">
+                    Number of Videos
+                </label>
 
-                    {/* Mobile: Preset buttons */}
-                    <div className="flex gap-2 md:hidden">
-                        {[5, 10, 15, 20].map((preset) => (
-                            <button
-                                key={preset}
-                                type="button"
-                                onClick={() => setCount(preset)}
-                                className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all ${count === preset
-                                        ? 'bg-gradient-to-r from-[var(--primary-start)] to-[var(--primary-end)] text-white'
-                                        : 'bg-[var(--background-hover)] hover:bg-[var(--border)]'
-                                    }`}
+                {/* Desktop: Visual Slider */}
+                <div className="hidden md:block">
+                    <div className="relative pt-1">
+                        <div className="flex items-center gap-4">
+                            <input
+                                type="range"
+                                min="1"
+                                max="20"
+                                value={count}
+                                onChange={(e) => setCount(parseInt(e.target.value))}
+                                className="flex-1 h-2 rounded-full appearance-none cursor-pointer"
+                                style={{
+                                    background: `linear-gradient(to right, var(--primary-start) 0%, var(--primary-end) ${(count / 20) * 100}%, var(--background-hover) ${(count / 20) * 100}%, var(--background-hover) 100%)`,
+                                }}
+                            />
+                            <div
+                                className="w-14 h-10 rounded-lg flex items-center justify-center font-bold text-lg"
+                                style={{
+                                    background: "linear-gradient(135deg, var(--primary-start), var(--primary-end))",
+                                }}
                             >
-                                {preset}
-                            </button>
-                        ))}
-                    </div>
-
-                    {/* Desktop: Slider */}
-                    <div className="hidden md:block">
-                        <input
-                            type="range"
-                            min="1"
-                            max="20"
-                            value={count}
-                            onChange={(e) => setCount(parseInt(e.target.value))}
-                            className="w-full accent-current"
-                            style={{ accentColor: "var(--primary-start)" }}
-                        />
-                        <div className="flex justify-between text-xs" style={{ color: "var(--foreground-muted)" }}>
+                                {count}
+                            </div>
+                        </div>
+                        <div className="flex justify-between text-xs mt-2 px-1" style={{ color: "var(--foreground-muted)" }}>
                             <span>1</span>
+                            <span>5</span>
+                            <span>10</span>
+                            <span>15</span>
                             <span>20</span>
                         </div>
                     </div>
                 </div>
 
-                {/* Advanced Options Accordion */}
-                <div className="border border-[var(--border)] rounded-lg overflow-hidden">
-                    <button
-                        type="button"
-                        onClick={() => setShowAdvanced(!showAdvanced)}
-                        className="w-full px-4 py-3 flex items-center justify-between text-sm font-medium hover:bg-[var(--background-hover)] transition-colors"
-                    >
-                        <span className="flex items-center gap-2">
-                            ⚙️ Advanced Options
-                            {hasAdvancedFilters && (
-                                <span
-                                    className="text-xs px-2 py-0.5 rounded-full"
-                                    style={{ background: "var(--primary-start)", color: "white" }}
-                                >
-                                    Active
-                                </span>
-                            )}
-                        </span>
-                        <svg
-                            className={`w-4 h-4 transition-transform ${showAdvanced ? 'rotate-180' : ''}`}
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
+                {/* Mobile: Preset buttons */}
+                <div className="flex gap-2 md:hidden">
+                    {[5, 10, 15, 20].map((preset) => (
+                        <button
+                            key={preset}
+                            type="button"
+                            onClick={() => setCount(preset)}
+                            className={`flex-1 py-3 rounded-xl text-sm font-semibold transition-all ${count === preset
+                                    ? "text-white shadow-lg"
+                                    : "hover:bg-[var(--border)]"
+                                }`}
+                            style={{
+                                background: count === preset
+                                    ? "linear-gradient(135deg, var(--primary-start), var(--primary-end))"
+                                    : "var(--background-hover)",
+                            }}
                         >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </button>
+                            {preset}
+                        </button>
+                    ))}
+                </div>
+            </div>
 
-                    {showAdvanced && (
-                        <div className="p-4 pt-0 space-y-4 border-t border-[var(--border)]">
+            {/* Advanced Options Accordion */}
+            <div className="glass-card overflow-hidden mb-6">
+                <button
+                    type="button"
+                    onClick={() => setShowAdvanced(!showAdvanced)}
+                    className="w-full px-5 py-4 flex items-center justify-between text-sm font-semibold hover:bg-[var(--background-hover)] transition-colors"
+                >
+                    <span className="flex items-center gap-2">
+                        <span className="text-lg">⚙️</span>
+                        Advanced Options
+                        {hasAdvancedFilters && (
+                            <span
+                                className="text-xs px-2 py-0.5 rounded-full font-medium"
+                                style={{ background: "linear-gradient(135deg, var(--primary-start), var(--primary-end))", color: "white" }}
+                            >
+                                Active
+                            </span>
+                        )}
+                    </span>
+                    <svg
+                        className={`w-5 h-5 transition-transform duration-300 ${showAdvanced ? "rotate-180" : ""}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+
+                {showAdvanced && (
+                    <div className="p-5 border-t space-y-5" style={{ borderColor: "var(--border)" }}>
+                        {/* Two-column grid for desktop */}
+                        <div className="grid md:grid-cols-2 gap-5">
                             {/* Year Range */}
-                            <div className="pt-4">
-                                <label className="block text-sm font-medium mb-2">📅 Year Range</label>
-                                <div className="flex gap-3 items-center">
+                            <div>
+                                <label className="block text-sm font-medium mb-2 flex items-center gap-2">
+                                    <span>📅</span> Year Range
+                                </label>
+                                <div className="flex gap-2 items-center">
                                     <select
                                         className="input flex-1"
                                         value={yearStart ?? ""}
@@ -187,7 +224,7 @@ export default function FilterPanel({
                                             <option key={y} value={y}>{y}</option>
                                         ))}
                                     </select>
-                                    <span style={{ color: "var(--foreground-muted)" }}>to</span>
+                                    <span style={{ color: "var(--foreground-muted)" }}>→</span>
                                     <select
                                         className="input flex-1"
                                         value={yearEnd ?? ""}
@@ -206,107 +243,111 @@ export default function FilterPanel({
 
                             {/* Duration Range */}
                             <div>
-                                <label className="block text-sm font-medium mb-2">⏱️ Video Duration</label>
-                                <div className="flex gap-3 items-center">
-                                    <div className="flex-1">
-                                        <label className="text-xs mb-1 block" style={{ color: "var(--foreground-muted)" }}>Min</label>
-                                        <select
-                                            className="input w-full"
-                                            value={minDuration}
-                                            onChange={(e) => setMinDuration(parseFloat(e.target.value))}
-                                        >
-                                            <option value="0">No min</option>
-                                            <option value="1">1 min</option>
-                                            <option value="2">2 min</option>
-                                            <option value="3">3 min</option>
-                                            <option value="5">5 min</option>
-                                            <option value="10">10 min</option>
-                                            <option value="15">15 min</option>
-                                        </select>
-                                    </div>
-                                    <span style={{ color: "var(--foreground-muted)", marginTop: "18px" }}>to</span>
-                                    <div className="flex-1">
-                                        <label className="text-xs mb-1 block" style={{ color: "var(--foreground-muted)" }}>Max</label>
-                                        <select
-                                            className="input w-full"
-                                            value={maxDuration}
-                                            onChange={(e) => setMaxDuration(parseFloat(e.target.value))}
-                                        >
-                                            <option value="0">No max</option>
-                                            <option value="5">5 min</option>
-                                            <option value="10">10 min</option>
-                                            <option value="15">15 min</option>
-                                            <option value="20">20 min</option>
-                                            <option value="30">30 min</option>
-                                            <option value="60">60 min</option>
-                                        </select>
-                                    </div>
+                                <label className="block text-sm font-medium mb-2 flex items-center gap-2">
+                                    <span>⏱️</span> Video Duration
+                                </label>
+                                <div className="flex gap-2 items-center">
+                                    <select
+                                        className="input flex-1"
+                                        value={minDuration}
+                                        onChange={(e) => setMinDuration(parseFloat(e.target.value))}
+                                    >
+                                        <option value="0">Min...</option>
+                                        <option value="1">1 min</option>
+                                        <option value="2">2 min</option>
+                                        <option value="3">3 min</option>
+                                        <option value="5">5 min</option>
+                                        <option value="10">10 min</option>
+                                        <option value="15">15 min</option>
+                                    </select>
+                                    <span style={{ color: "var(--foreground-muted)" }}>→</span>
+                                    <select
+                                        className="input flex-1"
+                                        value={maxDuration}
+                                        onChange={(e) => setMaxDuration(parseFloat(e.target.value))}
+                                    >
+                                        <option value="0">Max...</option>
+                                        <option value="5">5 min</option>
+                                        <option value="10">10 min</option>
+                                        <option value="15">15 min</option>
+                                        <option value="20">20 min</option>
+                                        <option value="30">30 min</option>
+                                        <option value="60">60 min</option>
+                                    </select>
                                 </div>
                             </div>
+                        </div>
 
-                            {/* Toggles */}
-                            <div className="flex flex-wrap gap-4">
-                                <label className="flex items-center gap-2 cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={deepCuts}
-                                        onChange={(e) => setDeepCuts(e.target.checked)}
-                                        className="w-5 h-5 rounded"
-                                    />
-                                    <span className="text-sm">Deep Cuts Only</span>
+                        {/* Toggles Row */}
+                        <div className="flex flex-wrap gap-4 pt-2">
+                            <label className="flex items-center gap-3 cursor-pointer p-3 rounded-xl hover:bg-[var(--background-hover)] transition-colors">
+                                <input
+                                    type="checkbox"
+                                    checked={deepCuts}
+                                    onChange={(e) => setDeepCuts(e.target.checked)}
+                                    className="w-5 h-5 rounded accent-purple-500"
+                                />
+                                <div>
+                                    <span className="text-sm font-medium">Deep Cuts Only</span>
                                     <span
-                                        className="text-xs px-2 py-0.5 rounded-full"
+                                        className="ml-2 text-xs px-2 py-0.5 rounded-full"
                                         style={{ background: "var(--background-hover)", color: "var(--foreground-muted)" }}
                                     >
                                         Hidden gems
                                     </span>
-                                </label>
+                                </div>
+                            </label>
 
-                                <label className="flex items-center gap-2 cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={excludeShorts}
-                                        onChange={(e) => setExcludeShorts(e.target.checked)}
-                                        className="w-5 h-5 rounded"
-                                    />
-                                    <span className="text-sm">Exclude Shorts</span>
-                                </label>
-                            </div>
+                            <label className="flex items-center gap-3 cursor-pointer p-3 rounded-xl hover:bg-[var(--background-hover)] transition-colors">
+                                <input
+                                    type="checkbox"
+                                    checked={excludeShorts}
+                                    onChange={(e) => setExcludeShorts(e.target.checked)}
+                                    className="w-5 h-5 rounded accent-purple-500"
+                                />
+                                <span className="text-sm font-medium">Exclude Shorts</span>
+                            </label>
                         </div>
-                    )}
-                </div>
-
-                {/* Generate Button */}
-                <button
-                    className="btn-primary w-full mt-4"
-                    onClick={onGenerate}
-                    disabled={loading || disabled}
-                >
-                    {loading ? (
-                        <span className="flex items-center justify-center gap-2">
-                            <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                                <circle
-                                    className="opacity-25"
-                                    cx="12"
-                                    cy="12"
-                                    r="10"
-                                    stroke="currentColor"
-                                    strokeWidth="4"
-                                    fill="none"
-                                />
-                                <path
-                                    className="opacity-75"
-                                    fill="currentColor"
-                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                />
-                            </svg>
-                            {topicPrompt ? "AI Analyzing..." : "Generating..."}
-                        </span>
-                    ) : (
-                        `✨ Generate ${count} Video${count > 1 ? "s" : ""}`
-                    )}
-                </button>
+                    </div>
+                )}
             </div>
+
+            {/* Generate Button - Full Width Gradient */}
+            <button
+                className="w-full py-4 rounded-xl font-semibold text-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                style={{
+                    background: "linear-gradient(135deg, var(--primary-start), var(--primary-end))",
+                    boxShadow: "0 8px 32px rgba(99, 102, 241, 0.4)",
+                }}
+                onClick={onGenerate}
+                disabled={loading || disabled}
+            >
+                {loading ? (
+                    <span className="flex items-center justify-center gap-3">
+                        <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                            <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                                fill="none"
+                            />
+                            <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            />
+                        </svg>
+                        {topicPrompt ? "AI is finding your videos..." : "Generating..."}
+                    </span>
+                ) : (
+                    <span className="flex items-center justify-center gap-2">
+                        ✨ Generate {count} Video{count > 1 ? "s" : ""}
+                    </span>
+                )}
+            </button>
         </div>
     );
 }

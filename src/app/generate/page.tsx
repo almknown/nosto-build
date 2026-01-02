@@ -9,6 +9,12 @@ import type { ChannelResponse, PlaylistFilters, GeneratedPlaylistResponse } from
 
 type Step = "search" | "indexing" | "filter" | "result";
 
+const STEPS = [
+    { id: "search", label: "Channel", icon: "🔍" },
+    { id: "indexing", label: "Loading", icon: "⏳" },
+    { id: "filter", label: "Filters", icon: "⚙️" },
+] as const;
+
 export default function GeneratePage() {
     const [step, setStep] = useState<Step>("search");
     const [channel, setChannel] = useState<ChannelResponse | null>(null);
@@ -80,13 +86,21 @@ export default function GeneratePage() {
         setError(null);
     };
 
+    const getStepIndex = (s: Step): number => {
+        const idx = STEPS.findIndex(step => step.id === s);
+        return idx === -1 ? STEPS.length : idx;
+    };
+
+    const currentStepIndex = getStepIndex(step);
+
     return (
         <main className="min-h-screen py-12 px-4 flex flex-col items-center justify-center">
             <div className="w-full max-w-3xl animate-fadeIn">
                 {/* Header */}
                 <div className="text-center mb-10">
                     <h1 className="text-4xl md:text-5xl font-bold mb-4">
-                        <span className="gradient-text">NosBot</span> Generator
+                        <span className="gradient-text-logo">NosBot</span>{" "}
+                        <span style={{ color: "var(--foreground)" }}>Generator</span>
                     </h1>
                     <p className="text-lg" style={{ color: "var(--foreground-muted)" }}>
                         Configure your filters and let AI curate the perfect playlist
@@ -95,42 +109,54 @@ export default function GeneratePage() {
 
                 {/* Main Interaction Card */}
                 <div className="glass-card p-6 md:p-10 w-full relative overflow-visible">
-                    {/* Progress indicator */}
+                    {/* Step indicator - Redesigned pill style with labels */}
                     {step !== "result" && (
                         <div className="flex justify-center mb-8">
-                            <div className="flex items-center gap-2">
-                                {["search", "indexing", "filter"].map((s, i) => (
-                                    <div key={s} className="flex items-center">
-                                        <div
-                                            className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all ${step === s
-                                                ? "animate-pulse-glow"
-                                                : i < ["search", "indexing", "filter"].indexOf(step)
-                                                    ? ""
-                                                    : ""
+                            <div className="inline-flex items-center gap-0 p-1 rounded-full" style={{ background: "var(--background)" }}>
+                                {STEPS.map((s, i) => {
+                                    const isActive = step === s.id;
+                                    const isCompleted = currentStepIndex > i;
+                                    const isClickable = i < currentStepIndex;
+
+                                    return (
+                                        <button
+                                            key={s.id}
+                                            className={`relative flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${isActive
+                                                    ? "text-white shadow-lg"
+                                                    : isCompleted
+                                                        ? "text-white/80 hover:text-white"
+                                                        : ""
                                                 }`}
                                             style={{
-                                                background:
-                                                    step === s || i < ["search", "indexing", "filter"].indexOf(step)
-                                                        ? "linear-gradient(135deg, var(--primary-start), var(--primary-end))"
-                                                        : "var(--background-card)",
-                                                border: "1px solid var(--border)",
+                                                background: isActive
+                                                    ? "linear-gradient(135deg, var(--primary-start), var(--primary-end))"
+                                                    : isCompleted
+                                                        ? "rgba(99, 102, 241, 0.3)"
+                                                        : "transparent",
+                                                color: isActive || isCompleted ? undefined : "var(--foreground-muted)",
+                                                cursor: isClickable ? "pointer" : "default",
                                             }}
+                                            onClick={() => {
+                                                if (isClickable) {
+                                                    if (s.id === "search") {
+                                                        handleReset();
+                                                    } else if (s.id === "filter" && channel?.indexStatus === "COMPLETE") {
+                                                        setStep("filter");
+                                                    }
+                                                }
+                                            }}
+                                            disabled={!isClickable && !isActive}
                                         >
-                                            {i + 1}
-                                        </div>
-                                        {i < 2 && (
-                                            <div
-                                                className="w-12 h-0.5 mx-2"
-                                                style={{
-                                                    background:
-                                                        i < ["search", "indexing", "filter"].indexOf(step)
-                                                            ? "var(--primary-start)"
-                                                            : "var(--border)",
-                                                }}
-                                            />
-                                        )}
-                                    </div>
-                                ))}
+                                            <span className="hidden sm:inline">{s.icon}</span>
+                                            <span>{s.label}</span>
+                                            {isCompleted && !isActive && (
+                                                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            )}
+                                        </button>
+                                    );
+                                })}
                             </div>
                         </div>
                     )}
@@ -149,27 +175,33 @@ export default function GeneratePage() {
 
                         {step === "filter" && channel && (
                             <div className="w-full">
-                                {/* Channel Info - Inline */}
-                                <div className="flex items-center gap-4 mb-8 p-4 rounded-lg bg-[var(--background)] border border-[var(--border)]">
+                                {/* Channel Info - Enhanced */}
+                                <div className="flex items-center gap-4 mb-8 p-4 rounded-xl bg-gradient-to-r from-[var(--background)] to-[var(--background-card)] border border-[var(--border)]">
                                     {channel.thumbnailUrl && (
                                         <img
                                             src={channel.thumbnailUrl}
                                             alt={channel.title}
-                                            className="w-12 h-12 rounded-full ring-2 ring-[var(--primary-start)]"
+                                            className="w-14 h-14 rounded-full ring-2 ring-offset-2 ring-offset-[var(--background-card)]"
+                                            style={{ boxShadow: "0 4px 12px rgba(99, 102, 241, 0.3)" }}
                                         />
                                     )}
                                     <div className="flex-1">
-                                        <h3 className="font-semibold text-lg">{channel.title}</h3>
+                                        <h3 className="font-semibold text-lg flex items-center gap-2">
+                                            {channel.title}
+                                            <svg className="w-4 h-4 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                            </svg>
+                                        </h3>
                                         <p className="text-sm" style={{ color: "var(--foreground-muted)" }}>
-                                            {channel.indexedVideoCount.toLocaleString()} videos found
+                                            {channel.indexedVideoCount.toLocaleString()} videos ready
                                         </p>
                                     </div>
                                     <button
-                                        className="text-sm px-3 py-1.5 rounded hover:text-white transition-colors"
-                                        style={{ color: "var(--foreground-muted)" }}
+                                        className="text-sm px-4 py-2 rounded-lg border transition-all hover:bg-[var(--background-hover)] hover:border-[var(--primary-start)]"
+                                        style={{ color: "var(--foreground-muted)", borderColor: "var(--border)" }}
                                         onClick={handleReset}
                                     >
-                                        Change Channel
+                                        Change
                                     </button>
                                 </div>
 
@@ -178,7 +210,6 @@ export default function GeneratePage() {
                                     onGenerate={handleGenerate}
                                     loading={loading}
                                     disabled={false}
-                                // Pass full width to children
                                 />
 
                                 {error && (
