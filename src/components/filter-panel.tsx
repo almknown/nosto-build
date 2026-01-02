@@ -24,6 +24,8 @@ export default function FilterPanel({
     const [deepCuts, setDeepCuts] = useState(false);
     const [excludeShorts, setExcludeShorts] = useState(true);
     const [count, setCount] = useState(10);
+    const [minDuration, setMinDuration] = useState<number>(0); // minutes
+    const [maxDuration, setMaxDuration] = useState<number>(0); // 0 = no limit
 
     // Sync filters with parent
     useEffect(() => {
@@ -36,9 +38,12 @@ export default function FilterPanel({
         }
         if (deepCuts) filters.deepCuts = true;
         if (excludeShorts) filters.excludeShorts = true;
+        // Duration filters (convert minutes to seconds)
+        if (minDuration > 0) filters.minDuration = minDuration * 60;
+        if (maxDuration > 0) filters.maxDuration = maxDuration * 60;
 
         onFiltersChange(filters, count);
-    }, [yearStart, yearEnd, topicPrompt, deepCuts, excludeShorts, count, onFiltersChange]);
+    }, [yearStart, yearEnd, topicPrompt, deepCuts, excludeShorts, count, minDuration, maxDuration, onFiltersChange]);
 
     const years = Array.from({ length: currentYear - 2005 + 1 }, (_, i) => 2005 + i).reverse();
 
@@ -116,6 +121,60 @@ export default function FilterPanel({
                             ))}
                         </select>
                     </div>
+                </div>
+
+                {/* Duration Range */}
+                <div>
+                    <label className="block text-sm font-medium mb-2">
+                        ⏱️ Video Duration (minutes)
+                    </label>
+                    <div className="flex gap-3 items-center">
+                        <div className="flex-1">
+                            <label className="text-xs mb-1 block" style={{ color: "var(--foreground-muted)" }}>Min</label>
+                            <select
+                                className="input w-full"
+                                value={minDuration}
+                                onChange={(e) => setMinDuration(parseInt(e.target.value))}
+                            >
+                                <option value="0">No min</option>
+                                <option value="1">1 min</option>
+                                <option value="2">2 min</option>
+                                <option value="3">3 min</option>
+                                <option value="5">5 min</option>
+                                <option value="8">8 min</option>
+                                <option value="10">10 min</option>
+                                <option value="15">15 min</option>
+                                <option value="20">20 min</option>
+                                <option value="30">30 min</option>
+                            </select>
+                        </div>
+                        <span style={{ color: "var(--foreground-muted)", marginTop: "18px" }}>to</span>
+                        <div className="flex-1">
+                            <label className="text-xs mb-1 block" style={{ color: "var(--foreground-muted)" }}>Max</label>
+                            <select
+                                className="input w-full"
+                                value={maxDuration}
+                                onChange={(e) => setMaxDuration(parseInt(e.target.value))}
+                            >
+                                <option value="0">No max</option>
+                                <option value="3">3 min</option>
+                                <option value="5">5 min</option>
+                                <option value="8">8 min</option>
+                                <option value="10">10 min</option>
+                                <option value="15">15 min</option>
+                                <option value="20">20 min</option>
+                                <option value="30">30 min</option>
+                                <option value="45">45 min</option>
+                                <option value="60">60 min</option>
+                            </select>
+                        </div>
+                    </div>
+                    {minDuration > 0 || maxDuration > 0 ? (
+                        <p className="text-xs mt-1 font-medium" style={{ color: "var(--primary-start)" }}>
+                            📏 Filtering: {minDuration > 0 ? `${minDuration}+ min` : "any"}
+                            {maxDuration > 0 ? ` up to ${maxDuration} min` : ""}
+                        </p>
+                    ) : null}
                 </div>
 
                 {/* Toggles */}
