@@ -72,7 +72,7 @@ export default function FilterPanel({
                     <input
                         type="range"
                         min="1"
-                        max="25"
+                        max="20"
                         value={count}
                         onChange={(e) => setCount(parseInt(e.target.value))}
                         className="w-full accent-current"
@@ -80,7 +80,7 @@ export default function FilterPanel({
                     />
                     <div className="flex justify-between text-xs" style={{ color: "var(--foreground-muted)" }}>
                         <span>1</span>
-                        <span>25</span>
+                        <span>20</span>
                     </div>
                 </div>
 
