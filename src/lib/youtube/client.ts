@@ -63,58 +63,35 @@ async function logQuota(endpoint: string, units: number) {
  * Resolve a channel handle or ID to full channel info
  */
 export async function resolveChannel(query: string) {
-    console.log(`[YOUTUBE_CLIENT] resolveChannel called with query: "${query}"`);
-
-    if (!API_KEY) {
-        console.error('[YOUTUBE_CLIENT] YouTube API key not configured');
-        throw new Error("YouTube API key not configured");
-    }
+    if (!API_KEY) throw new Error("YouTube API key not configured");
 
     // Try by handle first
     let url = `${YOUTUBE_API_BASE}/channels?key=${API_KEY}&part=snippet,contentDetails,statistics`;
 
     if (query.startsWith("@")) {
         url += `&forHandle=${encodeURIComponent(query)}`;
-        console.log(`[YOUTUBE_CLIENT] Searching by handle: ${query}`);
     } else if (query.startsWith("UC")) {
         url += `&id=${encodeURIComponent(query)}`;
-        console.log(`[YOUTUBE_CLIENT] Searching by ID: ${query}`);
     } else {
         // Try as handle without @
         url += `&forHandle=${encodeURIComponent("@" + query)}`;
-        console.log(`[YOUTUBE_CLIENT] Searching by handle (adding @): @${query}`);
     }
 
-    console.log(`[YOUTUBE_CLIENT] Fetching from YouTube API...`);
     const res = await fetch(url);
-
-    // Log quota (don't let it fail the request)
-    try {
-        await logQuota("channels.list", QUOTA_COSTS["channels.list"]);
-    } catch (quotaError) {
-        console.error('[YOUTUBE_CLIENT] Failed to log quota:', quotaError);
-    }
+    await logQuota("channels.list", QUOTA_COSTS["channels.list"]);
 
     if (!res.ok) {
-        console.error(`[YOUTUBE_CLIENT] YouTube API error: ${res.status}`);
-        const errorText = await res.text();
-        console.error(`[YOUTUBE_CLIENT] Error response:`, errorText);
         throw new Error(`YouTube API error: ${res.status}`);
     }
 
     const data: YouTubeChannelResponse = await res.json();
-    console.log(`[YOUTUBE_CLIENT] YouTube API response:`, {
-        itemsCount: data.items?.length || 0,
-        hasItems: !!data.items?.length
-    });
 
     if (!data.items?.length) {
-        console.error(`[YOUTUBE_CLIENT] Channel not found for query: "${query}"`);
         throw new Error("Channel not found");
     }
 
     const channel = data.items[0];
-    const result = {
+    return {
         youtubeId: channel.id,
         title: channel.snippet.title,
         handle: channel.snippet.customUrl || null,
@@ -122,15 +99,6 @@ export async function resolveChannel(query: string) {
         uploadPlaylistId: channel.contentDetails.relatedPlaylists.uploads,
         totalVideoCount: parseInt(channel.statistics.videoCount, 10),
     };
-
-    console.log(`[YOUTUBE_CLIENT] ✅ Successfully resolved channel:`, {
-        id: result.youtubeId,
-        title: result.title,
-        handle: result.handle,
-        videoCount: result.totalVideoCount
-    });
-
-    return result;
 }
 
 /**

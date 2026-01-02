@@ -1,76 +1,133 @@
-'use client';
+"use client";
 
-import { Component, ReactNode } from 'react';
+import { Component, ErrorInfo, ReactNode } from "react";
 
-interface ErrorBoundaryProps {
+interface Props {
     children: ReactNode;
     fallback?: ReactNode;
 }
 
-interface ErrorBoundaryState {
+interface State {
     hasError: boolean;
     error: Error | null;
+    errorInfo: ErrorInfo | null;
 }
 
-export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
-    constructor(props: ErrorBoundaryProps) {
+/**
+ * Error Boundary component for graceful error handling
+ * Catches JavaScript errors anywhere in the child component tree
+ */
+export default class ErrorBoundary extends Component<Props, State> {
+    constructor(props: Props) {
         super(props);
-        this.state = { hasError: false, error: null };
+        this.state = {
+            hasError: false,
+            error: null,
+            errorInfo: null,
+        };
     }
 
-    static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    static getDerivedStateFromError(error: Error): Partial<State> {
         return { hasError: true, error };
     }
 
-    componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-        console.error('Error caught by boundary:', error, errorInfo);
+    componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
+        console.error("ErrorBoundary caught an error:", error, errorInfo);
+        this.setState({ errorInfo });
     }
 
-    handleReset = () => {
-        this.setState({ hasError: false, error: null });
+    handleReset = (): void => {
+        this.setState({
+            hasError: false,
+            error: null,
+            errorInfo: null,
+        });
     };
 
-    render() {
+    render(): ReactNode {
         if (this.state.hasError) {
             if (this.props.fallback) {
                 return this.props.fallback;
             }
 
             return (
-                <div className="min-h-screen flex items-center justify-center p-4">
-                    <div className="glass-card p-8 max-w-md w-full text-center space-y-4">
-                        <div className="text-6xl mb-4">😕</div>
-                        <h1 className="text-2xl font-bold gradient-text">
-                            Something went wrong
-                        </h1>
-                        <p className="text-foreground-muted">
-                            We encountered an unexpected error. Don't worry, your data is safe.
-                        </p>
+                <div className="glass-card p-8 max-w-lg mx-auto my-8 text-center">
+                    <div className="text-5xl mb-4">😵</div>
+                    <h2 className="text-xl font-semibold mb-2">
+                        Something went wrong
+                    </h2>
+                    <p
+                        className="mb-4"
+                        style={{ color: "var(--foreground-muted)" }}
+                    >
+                        {this.state.error?.message || "An unexpected error occurred"}
+                    </p>
+                    <button
+                        onClick={this.handleReset}
+                        className="btn-primary"
+                    >
+                        Try Again
+                    </button>
 
-                        {process.env.NODE_ENV === 'development' && this.state.error && (
-                            <details className="text-left mt-4 p-4 bg-background-card rounded-lg border border-border">
-                                <summary className="cursor-pointer text-sm font-medium text-foreground-muted mb-2">
-                                    Error Details (Dev Only)
-                                </summary>
-                                <pre className="text-xs text-error overflow-auto">
-                                    {this.state.error.message}
-                                    {'\n\n'}
-                                    {this.state.error.stack}
-                                </pre>
-                            </details>
-                        )}
-
-                        <button
-                            onClick={this.handleReset}
-                            className="btn-primary w-full mt-6"
-                        >
-                            Try Again
-                        </button>
-                    </div>
+                    {process.env.NODE_ENV === "development" && this.state.errorInfo && (
+                        <details className="mt-6 text-left">
+                            <summary
+                                className="cursor-pointer text-sm"
+                                style={{ color: "var(--foreground-muted)" }}
+                            >
+                                Error Details (Development Only)
+                            </summary>
+                            <pre
+                                className="mt-2 p-4 rounded-lg text-xs overflow-auto"
+                                style={{
+                                    background: "var(--background)",
+                                    color: "var(--error)",
+                                }}
+                            >
+                                {this.state.error?.stack}
+                                {"\n\nComponent Stack:\n"}
+                                {this.state.errorInfo.componentStack}
+                            </pre>
+                        </details>
+                    )}
                 </div>
             );
         }
 
         return this.props.children;
     }
+}
+
+/**
+ * Inline error display component for non-fatal errors
+ */
+export function InlineError({
+    message,
+    onRetry,
+}: {
+    message: string;
+    onRetry?: () => void;
+}) {
+    return (
+        <div
+            className="p-4 rounded-lg flex items-center gap-3"
+            style={{
+                background: "rgba(239, 68, 68, 0.1)",
+                border: "1px solid var(--error)",
+            }}
+        >
+            <span className="text-xl">⚠️</span>
+            <div className="flex-1">
+                <p style={{ color: "var(--error)" }}>{message}</p>
+            </div>
+            {onRetry && (
+                <button
+                    onClick={onRetry}
+                    className="btn-secondary text-sm px-3 py-1"
+                >
+                    Retry
+                </button>
+            )}
+        </div>
+    );
 }

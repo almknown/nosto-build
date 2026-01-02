@@ -9,25 +9,25 @@
   --primary-start: #8b5cf6;
   --primary-end: #ec4899;
   --primary-hover: #7c3aed;
-
+  
   --background: #0f0f1a;
   --background-card: #1a1a2e;
   --background-hover: #252540;
-
+  
   --foreground: #f8fafc;
   --foreground-muted: #94a3b8;
-
+  
   --border: #2d2d44;
   --error: #ef4444;
   --success: #10b981;
   --warning: #f59e0b;
-
+  
   /* Shadows */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.4);
   --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.5);
-
+  
   /* Transitions */
   --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -209,21 +209,18 @@ textarea.input {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(90deg,
-      transparent,
-      rgba(255, 255, 255, 0.3),
-      transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
   animation: shimmer 2s infinite;
 }
 
 @keyframes shimmer {
-  0% {
-    transform: translateX(-100%);
-  }
-
-  100% {
-    transform: translateX(100%);
-  }
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -256,15 +253,8 @@ textarea.input {
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 @keyframes float {
-
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(-10px);
-  }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
 }
 
 .animate-float {
@@ -272,12 +262,9 @@ textarea.input {
 }
 
 @keyframes pulse-glow {
-
-  0%,
-  100% {
+  0%, 100% {
     box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
   }
-
   50% {
     box-shadow: 0 0 30px rgba(236, 72, 153, 0.7);
   }
@@ -292,7 +279,6 @@ textarea.input {
     opacity: 0;
     transform: translateY(20px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -303,38 +289,25 @@ textarea.input {
   animation: fadeIn 0.5s ease-out;
 }
 
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.animate-spin {
-  animation: spin 1s linear infinite;
-}
-
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    LOADING SKELETONS
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 .skeleton {
-  background: linear-gradient(90deg,
-      var(--background-card) 0%,
-      var(--background-hover) 50%,
-      var(--background-card) 100%);
+  background: linear-gradient(
+    90deg,
+    var(--background-card) 0%,
+    var(--background-hover) 50%,
+    var(--background-card) 100%
+  );
   background-size: 200% 100%;
   animation: loading 1.5s ease-in-out infinite;
   border-radius: 8px;
 }
 
 @keyframes loading {
-  0% {
-    background-position: 200% 0;
-  }
-
-  100% {
-    background-position: -200% 0;
-  }
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -393,18 +366,17 @@ textarea.input {
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 @media (max-width: 768px) {
-
   .btn-primary,
   .btn-secondary {
     padding: 0.625rem 1.25rem;
     font-size: 0.875rem;
   }
-
+  
   .input {
     padding: 0.625rem 0.875rem;
     font-size: 0.875rem;
   }
-
+  
   .glass-card {
     border-radius: 12px;
   }
@@ -415,7 +387,6 @@ textarea.input {
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
 
 @media (prefers-reduced-motion: reduce) {
-
   *,
   *::before,
   *::after {
