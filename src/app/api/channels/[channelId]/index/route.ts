@@ -38,21 +38,40 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
             });
         }
 
+
+        // Check if already in progress - but detect stale indexing
         if (channel.indexStatus === "IN_PROGRESS") {
-            return NextResponse.json({
-                status: "in_progress",
-                indexedVideoCount: channel.indexedVideoCount,
-            });
+            // Check if it's been stuck for more than 5 minutes
+            const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+            const lastUpdate = channel.lastSyncedAt || channel.createdAt;
+
+            if (lastUpdate && lastUpdate > fiveMinutesAgo && channel.indexedVideoCount > 0) {
+                // Still actively indexing
+                return NextResponse.json({
+                    status: "in_progress",
+                    indexedVideoCount: channel.indexedVideoCount,
+                });
+            }
+
+            // Stale - reset and retry
+            console.log(`[INDEX] Channel ${channelId} was stuck, resetting and retrying`);
         }
 
         // Update status to in progress
         await prisma.channel.update({
             where: { youtubeId: channelId },
-            data: { indexStatus: "IN_PROGRESS" },
+            data: {
+                indexStatus: "IN_PROGRESS",
+                indexedVideoCount: 0, // Reset count for stuck channels
+            },
         });
 
-        // Trigger QStash webhook for serverless indexing
-        if (QSTASH_TOKEN) {
+        // TEMPORARILY: Always use sync indexing (QStash is failing silently)
+        // TODO: Re-enable QStash after debugging webhook issues
+        const USE_SYNC_INDEXING = true;
+
+        if (!USE_SYNC_INDEXING && QSTASH_TOKEN) {
+
             // Trim NEXTAUTH_URL to prevent URL parsing issues
             const baseUrl = (process.env.NEXTAUTH_URL || request.nextUrl.origin).trim();
             const webhookUrl = `${baseUrl}/api/webhooks/qstash`;
